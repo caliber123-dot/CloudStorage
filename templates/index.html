@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Storage System - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #4a6fdc 0%, #6c8ff8 100%);
+            color: white;
+            padding: 80px 0;
+            border-radius: 10px;
+        }
+        .feature-card {
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body data-bs-theme="{{ theme|default('light') }}">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-cloud me-2"></i>
+                Cloud Storage
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="theme-toggle ms-3">
+                            <div class="form-check form-switch" >
+                                <input class="form-check-input" style="margin-top: 10px;" type="checkbox" id="themeSwitch" {% if theme == 'dark' %}checked{% endif %}>
+                                <label class="form-check-label text-light" for="themeSwitch">
+                                    <i class="bi bi-moon-stars"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="ms-3">
+                    {% if user %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light">
+                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="btn btn-light">
+                            <i class="bi bi-person-plus me-2"></i>Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="container my-3">
+            <div class="hero-section p-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h1 class="display-4 fw-bold mb-4">Secure Cloud Storage for Everyone</h1>
+                        <p class="lead mb-4">Store, share, and access your files from anywhere with our secure cloud storage solution.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4 me-md-2">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Get Started
+                            </a>
+                            <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                                <i class="bi bi-info-circle me-2"></i>Learn More
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <img src="{{ url_for('static', filename='images/hero-image.png') }}" alt="Cloud Storage" class="img-fluid" onerror="this.style.display='none'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="container my-5" id="features">
+            <h2 class="text-center mb-5">Key Features</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+                            <h3 class="card-title">Secure Storage</h3>
+                            <p class="card-text">All your files are encrypted with AES-256 encryption, ensuring maximum security.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-share"></i>
+                            </div>
+                            <h3 class="card-title">Easy Sharing</h3>
+                            <p class="card-text">Share files and folders with anyone, with customizable access permissions.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h3 class="card-title">Version Control</h3>
+                            <p class="card-text">Access and restore previous versions of your files at any time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-laptop"></i>
+                            </div>
+                            <h3 class="card-title">Access Anywhere</h3>
+                            <p class="card-text">Access your files from any device with an internet connection.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <h3 class="card-title">Smart Search</h3>
+                            <p class="card-text">Find your files quickly with our powerful search and tagging system.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="bi bi-trash"></i>
+                            </div>
+                            <h3 class="card-title">Recycle Bin</h3>
+                            <p class="card-text">Accidentally deleted files can be recovered from the recycle bin for up to 30 days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="container my-5" id="pricing">
+            <h2 class="text-center mb-5">Pricing Plans</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header text-center py-4 bg-light">
+                            <h3 class="my-0 fw-normal">Free</h3>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title text-center mb-4">$0<small class="text-muted fw-light">/mo</small></h1>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>10 GB Storage</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Basic File Sharing</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Email Support</li>
+                                <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i>Version History</li>
+                                <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i>Advanced Security</li>
+                            </ul>
+                            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-auto w-100">Sign Up Free</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-primary">
+                        <div class="card-header text-center py-4 bg-primary text-white">
+                            <h3 class="my-0 fw-normal">Pro</h3>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title text-center mb-4">$9.99<small class="text-muted fw-light">/mo</small></h1>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>100 GB Storage</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Advanced Sharing</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Priority Support</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>30-Day Version History</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Enhanced Security</li>
+                            </ul>
+                            <a href="{{ url_for('register') }}" class="btn btn-primary mt-auto w-100">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header text-center py-4 bg-light">
+                            <h3 class="my-0 fw-normal">Business</h3>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h1 class="card-title text-center mb-4">$24.99<small class="text-muted fw-light">/mo</small></h1>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>1 TB Storage</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Team Collaboration</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>24/7 Support</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited Version History</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Enterprise-grade Security</li>
+                            </ul>
+                            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-auto w-100">Contact Sales</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="container my-5">
+            <div class="p-5 text-center bg-primary text-white rounded">
+                <h2 class="mb-3">Ready to get started?</h2>
+                <p class="lead mb-4">Sign up today and get 10GB of free storage!</p>
+                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">Create Free Account</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="bi bi-cloud me-2"></i> Cloud Storage</h5>
+                    <p>Secure, reliable cloud storage for everyone.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope me-2"></i> support@cloudstorage.com</li>
+                        <li><i class="bi bi-telephone me-2"></i> (123) 456-7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2025 Cloud Storage System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitch = document.getElementById('themeSwitch');
+            const body = document.body;
+            
+            // Check for saved theme preference or use default
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-bs-theme', savedTheme);
+            themeSwitch.checked = savedTheme === 'dark';
+            
+            // Theme switch event listener
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-bs-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.setAttribute('data-bs-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

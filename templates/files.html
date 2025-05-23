@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Storage System - Files</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body data-bs-theme="{{ theme }}">
+    {% extends "layout.html" %}
+    
+    {% block content %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>My Files</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('files') }}">My Files</a></li>
+                    {% for crumb in breadcrumbs %}
+                        {% if loop.last %}
+                            <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                        {% else %}
+                            <li class="breadcrumb-item"><a href="{{ url_for('files', folder=crumb.id) }}">{{ crumb.name }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="bi bi-upload"></i> Upload
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+                        <i class="bi bi-folder-plus"></i> New Folder
+                    </button>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-sort-down"></i> Sort
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item sort-link" href="{{ url_for('files', folder=current_folder._id if current_folder else None, sort='name') }}">Name</a></li>
+                        <li><a class="dropdown-item sort-link" href="{{ url_for('files', folder=current_folder._id if current_folder else None, sort='date') }}">Date</a></li>
+                        <li><a class="dropdown-item sort-link" href="{{ url_for('files', folder=current_folder._id if current_folder else None, sort='size') }}">Size</a></li>
+                        <li><a class="dropdown-item sort-link" href="{{ url_for('files', folder=current_folder._id if current_folder else None, sort='type') }}">Type</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files and Folders -->
+    <div class="row files-container">
+        {% for item in items %}
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card file-card">
+                    <div class="card-body">
+                        <div class="file-icon">
+                            {% if item.is_folder %}
+                                <i class="bi bi-folder-fill"></i>
+                            {% elif 'image' in item.type %}
+                                <i class="bi bi-file-earmark-image-fill"></i>
+                            {% elif 'pdf' in item.type %}
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            {% elif 'word' in item.type or 'document' in item.type %}
+                                <i class="bi bi-file-earmark-word-fill"></i>
+                            {% elif 'excel' in item.type or 'spreadsheet' in item.type %}
+                                <i class="bi bi-file-earmark-excel-fill"></i>
+                            {% elif 'presentation' in item.type or 'powerpoint' in item.type %}
+                                <i class="bi bi-file-earmark-ppt-fill"></i>
+                            {% elif 'text' in item.type %}
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                            {% elif 'zip' in item.type or 'archive' in item.type %}
+                                <i class="bi bi-file-earmark-zip-fill"></i>
+                            {% else %}
+                                <i class="bi bi-file-earmark-fill"></i>
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text">
+                            {% if not item.is_folder %}
+                                {{ item.size|format_size }} • 
+                            {% endif %}
+                            {{ item.updated_at|format_date }}
+                        </p>
+                        <div class="dropdown file-actions">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% if item.is_folder %}
+                                    <li><a class="dropdown-item" href="{{ url_for('files', folder=item._id) }}"><i class="bi bi-folder2-open"></i> Open</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item preview-file" href="#" data-file-id="{{ item._id }}" data-file-type="{{ item.type }}" data-file-name="{{ item.name }}"><i class="bi bi-eye"></i> Preview</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('download_file', file_id=item._id) }}"><i class="bi bi-download"></i> Download</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('file_versions', file_id=item._id) }}"><i class="bi bi-clock-history"></i> Version History</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item rename-item" href="#" data-item-id="{{ item._id }}" data-item-name="{{ item.name }}"><i class="bi bi-pencil"></i> Rename</a></li>
+                                <li><a class="dropdown-item share-item" href="#" data-item-id="{{ item._id }}" data-item-name="{{ item.name }}"><i class="bi bi-share"></i> Share</a></li>
+                                <li>
+                                    <a class="dropdown-item toggle-favorite" href="#" data-item-id="{{ item._id }}">
+                                        <i class="bi bi-{% if item.is_favorite %}star-fill{% else %}star{% endif %}"></i> 
+                                        {% if item.is_favorite %}Remove from{% else %}Add to{% endif %} Favorites
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger delete-item" href="#" data-item-id="{{ item._id }}" data-item-name="{{ item.name }}">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    {% if current_folder %}
+                        This folder is empty. Upload files or create a new folder.
+                    {% else %}
+                        You don't have any files yet. Upload files or create a new folder to get started.
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload Files</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <div class="upload-area" id="uploadArea" style="position: relative; border: 2px dashed #ccc; padding: 20px; text-align: center; margin-bottom: 20px; min-height: 150px;">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
+                            <p>Drag & drop files here or click to browse</p>
+                            <input type="file" id="fileUpload" name="file" multiple required style="display: block; width: 100%; height: 100%; opacity: 0; position: absolute; top: 0; left: 0; cursor: pointer;">
+                            <input type="hidden" name="folder_id" value="{{ current_folder._id if current_folder else '' }}">
+                        </div>
+                        <div class="upload-list mt-3" id="uploadList">
+                            <!-- Upload progress items will be added here -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" form="uploadForm">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newFolderModalLabel">Create New Folder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('create_folder') }}" method="post" id="newFolderForm">
+                        <div class="mb-3">
+                            <label for="folderName" class="form-label">Folder Name</label>
+                            <input type="text" class="form-control" id="folderName" name="folder_name" placeholder="Enter folder name" required>
+                            <input type="hidden" name="parent_folder_id" value="{{ current_folder._id if current_folder else '' }}">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" form="newFolderForm">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">File Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="previewContent" class="text-center">
+                        <!-- Preview content will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="previewDownloadBtn" class="btn btn-primary">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="renameModalLabel">Rename Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('rename_item', item_id='placeholder') }}" method="post" id="renameForm">
+                        <div class="mb-3">
+                            <label for="newName" class="form-label">New Name</label>
+                            <input type="text" class="form-control" id="newName" name="new_name" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" form="renameForm">Rename</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Share Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('share_item', item_id='placeholder') }}" method="post" id="shareForm">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="shareType" id="shareTypeUser" value="user" checked>
+                                <label class="form-check-label" for="shareTypeUser">
+                                    Share with specific user
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="shareType" id="shareTypePublic" value="public">
+                                <label class="form-check-label" for="shareTypePublic">
+                                    Create public link
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3" id="userEmailField">
+                            <label for="userEmail" class="form-label">User Email</label>
+                            <input type="email" class="form-control" id="userEmail" name="user_email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="permissions" class="form-label">Permissions</label>
+                            <select class="form-select" id="permissions" name="permissions">
+                                <option value="view">View only</option>
+                                <option value="view,download">View and download</option>
+                                <option value="view,download,edit">View, download, and edit</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="is_public" id="isPublic" value="false">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" form="shareForm">Share</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete "<span id="deleteItemName"></span>"?</p>
+                    <p class="text-muted">This item will be moved to trash and can be restored within 30 days.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to close modal and remove backdrop
+            function closeModal(modalId) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                if (modal) {
+                    modal.hide();
+                    // Remove modal backdrop
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                    // Remove modal-open class from body
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                }
+            }
+
+            // Function to clean up modal state
+            function cleanupModalState() {
+                // Remove all modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.remove();
+                });
+                // Remove modal-open class from body
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }
+            
+            // Add event listeners for modal close buttons
+            document.querySelectorAll('.modal .btn-close, .modal .btn-secondary').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalId = this.closest('.modal').id;
+                    closeModal(modalId);
+                });
+            });
+            
+            // Add event listeners for modal hidden event
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function() {
+                    cleanupModalState();
+                });
+            });
+
+            // Add event listener for ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cleanupModalState();
+                }
+            });
+
+            // Add event listener for clicking outside modal
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    cleanupModalState();
+                }
+            });
+
+            // Preview file
+            const previewLinks = document.querySelectorAll('.preview-file');
+            const previewModal = document.getElementById('previewModal');
+            const previewContent = document.getElementById('previewContent');
+            const previewDownloadBtn = document.getElementById('previewDownloadBtn');
+            const previewModalTitle = document.getElementById('previewModalLabel');
+            
+            previewLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clean up any existing modal state before opening new modal
+                    cleanupModalState();
+                    
+                    const fileId = this.getAttribute('data-file-id');
+                    const fileType = this.getAttribute('data-file-type');
+                    const fileName = this.getAttribute('data-file-name');
+                    
+                    previewModalTitle.textContent = fileName;
+                    previewDownloadBtn.href = `/download/${fileId}`;
+                    
+                    // Clear previous content
+                    previewContent.innerHTML = '';
+                    
+                    // Show loading indicator
+                    previewContent.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                    
+                    // Load preview based on file type
+                    if (fileType.includes('image')) {
+                        const img = document.createElement('img');
+                        img.src = `/preview/${fileId}`;
+                        img.className = 'img-fluid';
+                        img.alt = fileName;
+                        img.onload = function() {
+                            previewContent.innerHTML = '';
+                            previewContent.appendChild(img);
+                        };
+                        img.onerror = function() {
+                            previewContent.innerHTML = '<div class="alert alert-danger">Error loading image preview</div>';
+                        };
+                    } else if (fileType.includes('pdf')) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `/preview/${fileId}`;
+                        iframe.width = '100%';
+                        iframe.height = '500px';
+                        iframe.onerror = function() {
+                            previewContent.innerHTML = '<div class="alert alert-danger">Error loading PDF document</div>';
+                        };
+                        previewContent.innerHTML = '';
+                        previewContent.appendChild(iframe);
+                    } else if (fileType.includes('text') || fileType.includes('json') || fileType.includes('xml') || fileType.includes('html')) {
+                        fetch(`/preview/${fileId}`)
+                            .then(response => response.text())
+                            .then(text => {
+                                const pre = document.createElement('pre');
+                                pre.className = 'text-start';
+                                pre.textContent = text;
+                                previewContent.innerHTML = '';
+                                previewContent.appendChild(pre);
+                            })
+                            .catch(error => {
+                                previewContent.innerHTML = '<div class="alert alert-danger">Error loading file content</div>';
+                            });
+                    } else {
+                        previewContent.innerHTML = '<p>Preview not available for this file type. Please download the file to view it.</p>';
+                    }
+                    
+                    const modal = new bootstrap.Modal(previewModal);
+                    modal.show();
+                });
+            });
+            
+            // Rename item
+            const renameLinks = document.querySelectorAll('.rename-item');
+            const renameModal = document.getElementById('renameModal');
+            const renameForm = document.getElementById('renameForm');
+            const newNameInput = document.getElementById('newName');
+            
+            renameLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clean up any existing modal state before opening new modal
+                    cleanupModalState();
+                    
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    
+                    renameForm.action = `/rename/${itemId}`;
+                    newNameInput.value = itemName;
+                    
+                    const modal = new bootstrap.Modal(renameModal);
+                    modal.show();
+                });
+            });
+            
+            // Share item
+            const shareLinks = document.querySelectorAll('.share-item');
+            const shareModal = document.getElementById('shareModal');
+            const shareForm = document.getElementById('shareForm');
+            const shareTypeUser = document.getElementById('shareTypeUser');
+            const shareTypePublic = document.getElementById('shareTypePublic');
+            const userEmailField = document.getElementById('userEmailField');
+            const isPublicInput = document.getElementById('isPublic');
+            
+            shareLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clean up any existing modal state before opening new modal
+                    cleanupModalState();
+                    
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    
+                    shareForm.action = `/share/${itemId}`;
+                    document.getElementById('shareModalLabel').textContent = `Share: ${itemName}`;
+                    
+                    const modal = new bootstrap.Modal(shareModal);
+                    modal.show();
+                });
+            });
+            
+            // Delete item
+            const deleteLinks = document.querySelectorAll('.delete-item');
+            const deleteModal = document.getElementById('deleteModal');
+            const deleteItemNameSpan = document.getElementById('deleteItemName');
+            const confirmDeleteBtn = document.getElementById('confirmDelete');
+            let itemToDelete = null;
+            
+            deleteLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Clean up any existing modal state before opening new modal
+                    cleanupModalState();
+                    
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    
+                    itemToDelete = itemId;
+                    deleteItemNameSpan.textContent = itemName;
+                    
+                    const modal = new bootstrap.Modal(deleteModal);
+                    modal.show();
+                });
+            });
+            
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (itemToDelete) {
+                    fetch(`/delete/${itemToDelete}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the item from the UI
+                            const itemElement = document.querySelector(`[data-item-id="${itemToDelete}"]`).closest('.col-md-3');
+                            itemElement.remove();
+                            
+                            // Show success message
+                            const alert = document.createElement('div');
+                            alert.className = 'alert alert-success alert-dismissible fade show';
+                            alert.innerHTML = `
+                                Item deleted successfully
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            `;
+                            document.querySelector('.row.mb-4').appendChild(alert);
+                            
+                            // Close the modal
+                            closeModal('deleteModal');
+                        } else {
+                            throw new Error(data.error || 'Failed to delete item');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Show error message
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-danger alert-dismissible fade show';
+                        alert.innerHTML = `
+                            ${error.message || 'An error occurred while deleting the item'}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        document.querySelector('.row.mb-4').appendChild(alert);
+                    });
+                }
+            });
+            
+            // Toggle favorite
+            const favoriteLinks = document.querySelectorAll('.toggle-favorite');
+            
+            favoriteLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const itemId = this.getAttribute('data-item-id');
+                    
+                    fetch(`/toggle-favorite/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const icon = this.querySelector('i');
+                            if (data.is_favorite) {
+                                icon.classList.remove('bi-star');
+                                icon.classList.add('bi-star-fill');
+                                this.innerHTML = this.innerHTML.replace('Add to', 'Remove from');
+                            } else {
+                                icon.classList.remove('bi-star-fill');
+                                icon.classList.add('bi-star');
+                                this.innerHTML = this.innerHTML.replace('Remove from', 'Add to');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating favorites');
+                    });
+                });
+            });
+
+            // Add search functionality
+            const searchInput = document.querySelector('.search-container input');
+            const searchResults = document.createElement('div');
+            searchResults.className = 'search-results';
+            searchResults.style.display = 'none';
+            searchResults.style.position = 'absolute';
+            searchResults.style.top = '100%';
+            searchResults.style.left = '0';
+            searchResults.style.right = '0';
+            searchResults.style.backgroundColor = 'var(--bs-body-bg)';
+            searchResults.style.border = '1px solid var(--bs-border-color)';
+            searchResults.style.borderRadius = '4px';
+            searchResults.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            searchResults.style.zIndex = '1000';
+            searchResults.style.maxHeight = '400px';
+            searchResults.style.overflowY = 'auto';
+            searchResults.style.padding = '10px';
+
+            document.querySelector('.search-container').appendChild(searchResults);
+
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    fetch(`/search?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.results && data.results.length > 0) {
+                                searchResults.innerHTML = `
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Path</th>
+                                                <th>Type</th>
+                                                <th>Size</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${data.results.map(item => `
+                                                <tr>
+                                                    <td>
+                                                        <i class="bi ${item.is_folder ? 'bi-folder' : 'bi-file-earmark'} me-2"></i>
+                                                        ${item.name}
+                                                    </td>
+                                                    <td>${item.path || 'Home/My Files'}</td>
+                                                    <td>${item.is_folder ? 'Folder' : item.type || 'Unknown'}</td>
+                                                    <td>${item.is_folder ? '-' : formatSize(item.size)}</td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm">
+                                                            <a href="${item.is_folder ? `/files/${item._id}` : `/files?file=${item._id}&path=${encodeURIComponent(item.path || '')}`}" 
+                                                               class="btn btn-outline-primary btn-sm">
+                                                                <i class="bi ${item.is_folder ? 'bi-folder2-open' : 'bi-box-arrow-up-right'}"></i> 
+                                                                Open
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                `;
+                                searchResults.style.display = 'block';
+                            } else {
+                                searchResults.innerHTML = '<div class="p-2 text-muted">No results found</div>';
+                                searchResults.style.display = 'block';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Search error:', error);
+                            searchResults.innerHTML = '<div class="p-2 text-danger">Error performing search</div>';
+                            searchResults.style.display = 'block';
+                        });
+                }, 300);
+            });
+
+            // Helper function to format file size
+            function formatSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Handle keyboard navigation in search results
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchResults.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

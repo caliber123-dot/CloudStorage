@@ -1,0 +1,6 @@
+myenv/
+.env
+__pycache__/
+demo.py
+uploads/
+FIXES.md
