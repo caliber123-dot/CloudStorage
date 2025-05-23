@@ -57,7 +57,7 @@ A comprehensive cloud-based file storage system similar to OneDrive with email l
    ```
    SECRET_KEY=your_secret_key
    JWT_SECRET_KEY=your_jwt_secret_key
-   MONGO_URI=mongodb+srv://niyazpathan:sUOHMeG7VrBTYR7T@cluster0.ahhhgmz.mongodb.net/mystore_db?retryWrites=true&w=majority
+   MONGO_URI=mongodb+srv://<real_user>:<real_password>@cluster0.realdomain.mongodb.net
    ```
 
 ## Usage
