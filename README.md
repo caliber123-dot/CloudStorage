@@ -154,7 +154,7 @@ cloud_storage_system/
 └── README.md             # Project documentation
 ```
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 - **Backend**: Python Flask
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap
@@ -162,6 +162,6 @@ cloud_storage_system/
 - **Authentication**: JWT, OAuth 2.0
 - **Encryption**: AES-256
 
-## License
+## 🛡️ License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
