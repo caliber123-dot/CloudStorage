@@ -118,12 +118,11 @@ Store, share, and access your files from anywhere with our secure cloud storage 
     ```
 ### Home page
 <p align="center">
-  <img src="./static/images/Home.PNG" alt="Landing Page" width="600"/>
+  <img src="./static/images/Home.PNG" alt="Landing Page" />
   <br>
   <em>Landing Page Preview</em>
 </p>
-<br>
-<img src="./static/images/Home.PNG" alt='home'/>
+
 ## Usage
 
 1. Run the application on local machine:
