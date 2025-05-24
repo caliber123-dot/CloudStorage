@@ -2,7 +2,7 @@
 
 A comprehensive cloud-based file storage system similar to OneDrive with email login and access control.
 
-## 🌐 Cloud Storage Link:
+## 🌐 Web Link:
 
 <h4> Live Site: https://cloudstorage-rr82.onrender.com/ </h4>
 
