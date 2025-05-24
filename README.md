@@ -2,6 +2,10 @@
 
 A comprehensive cloud-based file storage system similar to OneDrive with email login and access control.
 
+## 🌐 Cloud Storage Link:
+
+<h4> Live Site: https://cloudstorage-rr82.onrender.com/ </h4>
+
 ## Features
 
 - **User Authentication**
@@ -39,14 +43,17 @@ A comprehensive cloud-based file storage system similar to OneDrive with email l
   - Responsive design for all devices
   - Light and dark theme switching
 
-## Installation in VS Code
+## Installation in vs code
 
 1. Create a virtual environment:
    ```
    python -m venv venv
    ```
 2. Activate the virtual environment:
-   - Windows: `venv\Scripts\activate`
+   - Windows: 
+    ```
+    venv\Scripts\activate
+    ```
 3. Install dependencies:
    ```
    pip install -r requirements.txt
@@ -97,8 +104,8 @@ A comprehensive cloud-based file storage system similar to OneDrive with email l
     git commit -m "first commit"
     ```
 6.  Create a New Repository on GitHub
-    Go to github.com/new
-    Do not initialize with README/.gitignore (you already have files locally).
+    - Go to github.com/new
+    - Do not initialize with README/.gitignore (you already have files locally).
 7. Link Local Project to GitHub (Example of Repository Link)
     ```
     git remote add origin https://github.com/your-username/repo-name.git
@@ -107,11 +114,6 @@ A comprehensive cloud-based file storage system similar to OneDrive with email l
     ```
     git push -u origin main
     ```
-## 🌐 Link:
-
-<h4> Live Site: https://cloudstorage-rr82.onrender.com/ </h4>
-
-<br>
 
 ## Usage
 
