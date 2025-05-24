@@ -6,7 +6,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
 
 <h3>🌐 Web Link :</h3>
 
-<h4> Live Site: https://cloudstorage-rr82.onrender.com/ </h4>
+<h4> Live Site: <a href="https://cloudstorage-rr82.onrender.com/" target="_blank">https://cloudstorage-rr82.onrender.com/</a></h4>
 
 ### 📃 Features :
 
