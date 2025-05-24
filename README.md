@@ -45,7 +45,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
   - Responsive design for all devices
   - Light and dark theme switching
 
-## Installation in vs code
+### Installation in vs code
 
 1. Create a virtual environment:
    ```
@@ -66,7 +66,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
    JWT_SECRET_KEY=your_jwt_secret_key
    MONGO_URI=mongodb+srv://<real_user>:<real_password>@cluster0.realdomain.mongodb.net
    ```
-## Requirements for deployment on the server.
+### Requirements for deployment on the server.
 1. Create a `requirements.txt` file with the following libraries:
    ```
    Flask==3.1.0
@@ -84,7 +84,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
     pip install -r requirements.txt
     ```
 
-## Push Code to GitHub from VS Code Turminal (First Time):
+### Push Code to GitHub from VS Code Turminal (First Time):
 1.  To freeze your requirements.txt file:
     ```
     pip freeze > requirements.txt
@@ -123,7 +123,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
   <em>Landing Page Preview</em>
 </p>
 
-## Usage
+### Usage
 
 1. Run the application on local machine:
    ```
@@ -132,7 +132,7 @@ Store, share, and access your files from anywhere with our secure cloud storage 
 2. Open your browser and navigate to `http://localhost:5000`
 3. Register a new account or log in with existing credentials
 
-## Project Structure
+### Project Structure
 
 ```
 cloud_storage_system/
@@ -154,7 +154,7 @@ cloud_storage_system/
 └── README.md             # Project documentation
 ```
 
-## 🛠️ Technologies Used
+### 🛠️ Technologies Used
 
 - **Backend**: Python Flask
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap
@@ -162,6 +162,6 @@ cloud_storage_system/
 - **Authentication**: JWT, OAuth 2.0
 - **Encryption**: AES-256
 
-## 🛡️ License
+### 🛡️ License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
